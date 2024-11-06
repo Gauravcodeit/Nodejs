@@ -1,4 +1,29 @@
 console.log("a");
+const fs = require("fs");
+const https = require("https");
+const http = require("http");
+const server =http.createServer((req, res)=>{
+
+   if (req.url=== "/homepage" ){
+        res.end("homepage")
+   }
+   else{
+    res.end("main server")
+   }
+   console.log("server")
+
+})
+server.listen(5500, ()=>{
+    console.log("server is running on localhost")
+})
+
+https.get('https://dummyjson.com/products/1', (res)=>{
+    console.log("result from http request")
+})
+fs.readFile("./file.txt", "utf8", (err, data)=>{
+    console.log("file data", data)
+})
+
 // require("./xyz");
 //  MODULE TYPE  PACKAGE JSON
 // import { calculate } from "./sum.js";
