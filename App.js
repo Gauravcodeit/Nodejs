@@ -9,6 +9,7 @@ app.get('/test', (req, res)=>{
     console.log(req.query)
     res.send({firstname: "Gaurav", lastname: "Adhikari"})
 })
+
 app.get('/ab+', (req, res)=>{
     res.send({usecase:"ab+"})
 })
@@ -32,6 +33,18 @@ app.get('/user/:id',(req, res)=>{
     console.log(req.params, "one")
     res.send(req.params)
 })
+
+app.use('/route',
+    (req, res, next)=>{
+        console.log(req.params, "one")
+        next();
+        //res.send("calling from one")
+    },
+    (req, res, next)=>{
+        console.log(req.params, "one")
+        res.send("calling from one 2")
+    }
+)
 
 app.listen(port, ()=>{
     console.log(`express server is running on port ${port}`)
