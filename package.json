@@ -6,6 +6,8 @@
     },
     "scripts": {
         "start" : "nodemon App.js",
-         "Basicstart" : "node App.js"
+         "Basicstart" : "node App.js",
+         "test": "echo \"Error: no test specified\" && exit 1"
+
     }
 }
