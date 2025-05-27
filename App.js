@@ -39,7 +39,14 @@ app.use('/user/login',(req, res, next)=>{
 })
 app.use('/admin', adminAuth)
 app.use('/admin/dashboard', (req, res, next)=>{
-    res.send("admin data sent")
+    try{
+        throw new Error("sm nsd")
+        res.send("admin data sent")
+    }
+    catch(err){
+        res.send("error is detected")
+    }
+
 })
 app.use('/user', userAuth, (req, res)=>{
     res.send("user data sent")
@@ -54,10 +61,21 @@ app.use('/route',
     (req, res, next)=>{
         console.log(req.params, "one")
         res.send("calling from one 2")
+        //throw new Error('new error')
+
     }
+
 )
 
+app.use('/', (err, req, res, next)=>{
+    if(err){
+        res.send("something went wrong")
+    }
+    else {
+        res.send("response is form /")
+    }
 
+})
 
 app.listen(port, ()=>{
     console.log(`express server is running on port ${port}`)
