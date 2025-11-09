@@ -6,9 +6,9 @@ const User = require('./SRC/Model/User')
 
 app.post("/signup", async (req, res)=>{
     const userObj = {
-        firstname:"Xero",
+        firstname:"zera",
         password:"2121@11",
-        gender:"Male"
+        gender:"femalee"
     }
     const userInstance = new User(userObj);
     try {
