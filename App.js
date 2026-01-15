@@ -4,12 +4,14 @@ const port = 3000;
 const connectDB = require('./SRC/MongoDB/Database')
 const User = require('./SRC/Model/User')
 
+app.use(express.json());
 app.post("/signup", async (req, res)=>{
-    const userObj = {
-        firstname:"zera",
-        password:"2121@11",
-        gender:"femalee"
-    }
+    // const userObj = {
+    //     firstname:"zera",
+    //     password:"2121@11",
+    //     gender:"femalee"
+    // }
+    const userObj = req.body
     const userInstance = new User(userObj);
     try {
         await userInstance.save();
