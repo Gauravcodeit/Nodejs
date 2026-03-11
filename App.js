@@ -5,11 +5,12 @@ const connectDB = require('./SRC/MongoDB/Database')
 const User = require('./SRC/Model/User')
 
 app.use(express.json());
+
 app.post("/signup", async (req, res)=>{
     // const userObj = {
     //     firstname:"zera",
     //     password:"2121@11",
-    //     gender:"femalee"
+    //     gender:"female"
     // }
     const userObj = req.body
     const userInstance = new User(userObj);
@@ -21,6 +22,27 @@ app.post("/signup", async (req, res)=>{
         res.sendStatus(500).send("Error")
     }
 
+})
+
+app.get("/user", async(req, res)=>{
+    let emailId = req.body.emailId
+    try {
+        const user = await User.find({emailId: emailId})
+        res.send(user);
+    }
+    catch(e) {
+        res.send("something went wrong")
+    }
+})
+
+app.get("/feed", async(req, res)=>{
+    try {
+        const users = await User.find({})
+        res.send(users);
+    }
+    catch(e) {
+        res.send("something went wrong")
+    }
 })
 
 connectDB()
