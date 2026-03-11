@@ -2,7 +2,8 @@ const  express=  require('express');
 const app =express();
 const port = 3000;
 const connectDB = require('./SRC/MongoDB/Database')
-const User = require('./SRC/Model/User')
+const User = require('./SRC/Model/User');
+const { ReturnDocument } = require('mongodb');
 
 app.use(express.json());
 
@@ -45,6 +46,31 @@ app.get("/feed", async(req, res)=>{
     }
 })
 
+app.delete("/user", async(req ,res) =>{
+     try {
+        const userId = req.body.userId
+        await User.findByIdAndDelete({_id : userId })
+        res.send("Deleted the record");
+    }
+    catch(e) {
+        res.send("something went wrong")
+    }
+})
+
+app.patch("/user", async(req ,res) =>{
+     try {
+        const userObj = req.body
+        const userId = req.body.userId;
+        const beforeValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "before"})
+         const afterValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "after"})
+        console.log(userId, beforeValue, afterValue)
+
+        res.send("updated the record");
+    }
+    catch(e) {
+        res.send("something went wrong")
+    }
+})
 connectDB()
 
 .then(()=>{
