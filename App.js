@@ -20,7 +20,7 @@ app.post("/signup", async (req, res)=>{
         res.send("Added sucessfully")
     }
     catch(e){
-        res.sendStatus(500).send("Error")
+        res.status(500).send( e)
     }
 
 })
@@ -61,20 +61,21 @@ app.patch("/user", async(req ,res) =>{
      try {
         const userObj = req.body
         const userId = req.body.userId;
-        const beforeValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "before"})
-         const afterValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "after"})
-        console.log(userId, beforeValue, afterValue)
+       // const beforeValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "before"})
+         const afterValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "after", runValidators: true})
+        // console.log(userId, beforeValue, afterValue)
 
         res.send("updated the record");
     }
     catch(e) {
-        res.send("something went wrong")
+        res.send(e)
     }
 })
 connectDB()
 
-.then(()=>{
+.then(async ()=>{
     console.log("Connected to database now..")
+    // await User.createIndexes(); // Ensure unique indexes are created
     app.listen(port, ()=>{
         console.log(`express server is running on port ${port}`)
     })
