@@ -57,10 +57,19 @@ app.delete("/user", async(req ,res) =>{
     }
 })
 
-app.patch("/user", async(req ,res) =>{
+app.patch("/user/:userId", async(req ,res) =>{
      try {
+
         const userObj = req.body
-        const userId = req.body.userId;
+        const userId = req.params.userId;
+        const allowedUpdate = ['firstname', 'skills', 'gender'];
+        const isAllowedUpdate = Object.keys(req.body).every((k) => allowedUpdate.includes(k))
+        if (userObj.skills.length > 5){
+            throw new Error("skills caannot be more than 5 - Update not allowed")
+        }
+        if(!isAllowedUpdate){
+            throw new Error("update not allowed")
+        }
        // const beforeValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "before"})
          const afterValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "after", runValidators: true})
         // console.log(userId, beforeValue, afterValue)
@@ -68,7 +77,7 @@ app.patch("/user", async(req ,res) =>{
         res.send("updated the record");
     }
     catch(e) {
-        res.send(e)
+        res.status(400).send(e.message)
     }
 })
 connectDB()
@@ -84,3 +93,5 @@ connectDB()
 .catch((error)=>{
     console.log("Issue while connecting to Database", error)
 })
+
+// api level validation
