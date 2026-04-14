@@ -21,6 +21,7 @@ app.post("/signup", async (req, res)=>{
 
         const {firstname, lastname, emailId, password, age} = req.body;
         const hashedPassword = await bcrypt.hash(password,10)
+        // Password hashing
         const userInstance = new User({
             firstname,
             lastname,
