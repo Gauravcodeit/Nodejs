@@ -4,6 +4,8 @@ const port = 3000;
 const connectDB = require('./SRC/MongoDB/Database')
 const User = require('./SRC/Model/User');
 const { ReturnDocument } = require('mongodb');
+const bcrypt = require('bcrypt')
+const { ValidateSignupData } = require('./SRC/Utility/ValidateSignupData');
 
 app.use(express.json());
 
@@ -13,9 +15,19 @@ app.post("/signup", async (req, res)=>{
     //     password:"2121@11",
     //     gender:"female"
     // }
-    const userObj = req.body
-    const userInstance = new User(userObj);
+
     try {
+        ValidateSignupData(req)
+
+        const {firstname, lastname, emailId, password, age} = req.body;
+        const hashedPassword = await bcrypt.hash(password,10)
+        const userInstance = new User({
+            firstname,
+            lastname,
+            emailId,
+            password: hashedPassword,
+            age
+        });
         await userInstance.save();
         res.send("Added sucessfully")
     }
@@ -73,7 +85,8 @@ app.patch("/user/:userId", async(req ,res) =>{
        // const beforeValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "before"})
          const afterValue = await User.findByIdAndUpdate(userId, userObj, { ReturnDocument: "after", runValidators: true})
         // console.log(userId, beforeValue, afterValue)
-
+        // we have runvalidtor because it can validate also in case of update as if do not call it will not work for
+        // update case and only work for first time we are saving the value to database
         res.send("updated the record");
     }
     catch(e) {
