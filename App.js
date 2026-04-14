@@ -37,6 +37,24 @@ app.post("/signup", async (req, res)=>{
 
 })
 
+app.post("/login", async (req, res)=>{
+    try {
+        const {emailId, password} = req.body;
+        const user = await User.findOne({emailId : emailId});
+        if (!user) {
+            throw new Error("User does not exists")
+        }
+        const isExists = await bcrypt.compare(password, user.password);
+        if (!isExists) {
+            throw new Error("Invalid Credentails")
+        }
+        res.send("Logged In successfully")
+    }
+    catch(e) {
+       res.status(500).send(e.message)
+    }
+})
+
 app.get("/user", async(req, res)=>{
     let emailId = req.body.emailId
     try {
