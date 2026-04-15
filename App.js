@@ -6,9 +6,13 @@ const User = require('./SRC/Model/User');
 const { ReturnDocument } = require('mongodb');
 const bcrypt = require('bcrypt')
 const { ValidateSignupData } = require('./SRC/Utility/ValidateSignupData');
+const { cookie } = require('express/lib/response');
+const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken');
+
 
 app.use(express.json());
-
+app.use(cookieParser())
 app.post("/signup", async (req, res)=>{
     // const userObj = {
     //     firstname:"zera",
@@ -49,11 +53,31 @@ app.post("/login", async (req, res)=>{
         if (!isExists) {
             throw new Error("Invalid Credentails")
         }
+        const token =  jwt.sign({ _id: user._id }, '12345');
+        res.cookie("token", token)
         res.send("Logged In successfully")
     }
     catch(e) {
        res.status(500).send(e.message)
     }
+})
+
+app.get("/profile", async(req,res)=>{
+    try {
+        const {token} = req.cookies;
+        if(!token){
+           throw new Error("UnAuthorised ")
+        }
+
+        const decoded = await jwt.verify(token, '12345');
+        const user = await User.findOne({_id: decoded._id})
+        console.log(token, decoded._id)
+        res.send(user)
+    }
+    catch(e) {
+        res.send(e.message)
+    }
+
 })
 
 app.get("/user", async(req, res)=>{
