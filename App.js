@@ -9,6 +9,7 @@ const { ValidateSignupData } = require('./SRC/Utility/ValidateSignupData');
 const { cookie } = require('express/lib/response');
 const cookieParser = require('cookie-parser')
 const jwt = require('jsonwebtoken');
+const { userAuth } = require('./SRC/Middleware/auth');
 
 
 app.use(express.json());
@@ -53,8 +54,11 @@ app.post("/login", async (req, res)=>{
         if (!isExists) {
             throw new Error("Invalid Credentails")
         }
-        const token =  jwt.sign({ _id: user._id }, '12345');
-        res.cookie("token", token)
+        const token =  jwt.sign({ _id: user._id }, '12345', {expiresIn : '2h'});
+        res.cookie("token", token,{
+            expires: new Date(Date.now() + 8 * 3600000) // cookie will be removed after 8 hours
+        }
+    )
         res.send("Logged In successfully")
     }
     catch(e) {
@@ -62,22 +66,25 @@ app.post("/login", async (req, res)=>{
     }
 })
 
-app.get("/profile", async(req,res)=>{
+app.get("/profile", userAuth, async(req,res)=>{
     try {
-        const {token} = req.cookies;
-        if(!token){
-           throw new Error("UnAuthorised ")
-        }
-
-        const decoded = await jwt.verify(token, '12345');
-        const user = await User.findOne({_id: decoded._id})
-        console.log(token, decoded._id)
+        const {user} = req
         res.send(user)
     }
     catch(e) {
         res.send(e.message)
     }
 
+})
+
+app.post("/sendconnectionrequest", userAuth, async(req, res)=>{
+    try {
+        const {user} = req
+        res.send("Connection request sent by " + user.firstname)
+    }
+    catch(e) {
+        res.send(e.message)
+    }
 })
 
 app.get("/user", async(req, res)=>{
