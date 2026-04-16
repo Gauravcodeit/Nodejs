@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt')
 const { ValidateSignupData } = require('./SRC/Utility/ValidateSignupData');
 const { cookie } = require('express/lib/response');
 const cookieParser = require('cookie-parser')
-const jwt = require('jsonwebtoken');
+
 const { userAuth } = require('./SRC/Middleware/auth');
 
 
@@ -50,11 +50,11 @@ app.post("/login", async (req, res)=>{
         if (!user) {
             throw new Error("User does not exists")
         }
-        const isExists = await bcrypt.compare(password, user.password);
+        const isExists = await user.validatePassword(password);
         if (!isExists) {
             throw new Error("Invalid Credentails")
         }
-        const token =  jwt.sign({ _id: user._id }, '12345', {expiresIn : '2h'});
+        const token =  await user.getJwt()
         res.cookie("token", token,{
             expires: new Date(Date.now() + 8 * 3600000) // cookie will be removed after 8 hours
         }
