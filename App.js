@@ -3,89 +3,18 @@ const app =express();
 const port = 3000;
 const connectDB = require('./SRC/MongoDB/Database')
 const User = require('./SRC/Model/User');
-const { ReturnDocument } = require('mongodb');
-const bcrypt = require('bcrypt')
-const { ValidateSignupData } = require('./SRC/Utility/ValidateSignupData');
-const { cookie } = require('express/lib/response');
 const cookieParser = require('cookie-parser')
-
-const { userAuth } = require('./SRC/Middleware/auth');
-
+const authRouter = require('./SRC/Router/Auth');
+const profileRouter = require('./SRC/Router/Profile');
+const requestRouter = require('./SRC/Router/Request');
 
 app.use(express.json());
-app.use(cookieParser())
-app.post("/signup", async (req, res)=>{
-    // const userObj = {
-    //     firstname:"zera",
-    //     password:"2121@11",
-    //     gender:"female"
-    // }
+app.use(cookieParser());
+app.use("/", authRouter);
+app.use("/", profileRouter)
+app.use("/", requestRouter)
 
-    try {
-        ValidateSignupData(req)
 
-        const {firstname, lastname, emailId, password, age} = req.body;
-        const hashedPassword = await bcrypt.hash(password,10)
-        // Password hashing
-        const userInstance = new User({
-            firstname,
-            lastname,
-            emailId,
-            password: hashedPassword,
-            age
-        });
-        await userInstance.save();
-        res.send("Added sucessfully")
-    }
-    catch(e){
-        res.status(500).send(e.message)
-    }
-
-})
-
-app.post("/login", async (req, res)=>{
-    try {
-        const {emailId, password} = req.body;
-        const user = await User.findOne({emailId : emailId});
-        if (!user) {
-            throw new Error("User does not exists")
-        }
-        const isExists = await user.validatePassword(password);
-        if (!isExists) {
-            throw new Error("Invalid Credentails")
-        }
-        const token =  await user.getJwt()
-        res.cookie("token", token,{
-            expires: new Date(Date.now() + 8 * 3600000) // cookie will be removed after 8 hours
-        }
-    )
-        res.send("Logged In successfully")
-    }
-    catch(e) {
-       res.status(500).send(e.message)
-    }
-})
-
-app.get("/profile", userAuth, async(req,res)=>{
-    try {
-        const {user} = req
-        res.send(user)
-    }
-    catch(e) {
-        res.send(e.message)
-    }
-
-})
-
-app.post("/sendconnectionrequest", userAuth, async(req, res)=>{
-    try {
-        const {user} = req
-        res.send("Connection request sent by " + user.firstname)
-    }
-    catch(e) {
-        res.send(e.message)
-    }
-})
 
 app.get("/user", async(req, res)=>{
     let emailId = req.body.emailId
