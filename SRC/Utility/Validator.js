@@ -14,7 +14,24 @@ const ValidateSignupData = (req) => {
     }
 }
 
+const IsStrongPassword = (password)  => {
+    if (!validator.isStrongPassword(password)){
+        throw new Error("Enter a strong new password")
+    }
+
+}
+
+const ValidateProfileData = (req) =>{
+    const allowedValues = ['firstname', 'lastname', 'age', 'gender', 'skills'];
+    const isvalid = Object.keys(req.body).every((value)=>{
+        return allowedValues.includes(value)
+    })
+    return isvalid
+}
+
 
 module.exports = {
-    ValidateSignupData
+    ValidateSignupData,
+    ValidateProfileData,
+    IsStrongPassword
 }
