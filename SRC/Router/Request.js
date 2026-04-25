@@ -2,6 +2,7 @@ const express = require("express");
 const { userAuth } = require('../Middleware/auth');
 const ConnectionRequest = require("../Model/ConnectionRequest");
 const requestRouter = express.Router();
+const User = require('../Model/User')
 
 requestRouter.post("/request/send/:status/:toUserId", userAuth, async(req, res)=>{
     try {
@@ -17,6 +18,10 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async(req, res)=
         if (!allowedStatus.includes(status)){
             return res.json({message : "Invalid Connection Request"})
         }
+        const toUser = await User.findById(toUserId);
+        if (!toUser) {
+            return res.status(404).json({message: "ToUserID does not exist"})
+        }
         const isRequestExist = await ConnectionRequest.findOne({
             $or:[
                {toUserId: toUserId, fromUserId : fromUserId },
@@ -24,10 +29,14 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async(req, res)=
             ]
         })
         if (isRequestExist){
-            throw new Error ("already request was sent ")
+            throw new Error ("already request was sent from either side")
         }
-        await connectionRequest.save();
-        res.send("Connection request sent by " + req.user.firstname)
+        const data =await connectionRequest.save();
+        res.json({
+            message:
+            req.user.firstname + " is " + status + " in " + toUser.firstname,
+            data,
+        });
     }
     catch(e) {
         res.send(e.message)
