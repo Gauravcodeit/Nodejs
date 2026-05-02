@@ -7,13 +7,14 @@ const cookieParser = require('cookie-parser')
 const authRouter = require('./SRC/Router/Auth');
 const profileRouter = require('./SRC/Router/Profile');
 const requestRouter = require('./SRC/Router/Request');
+const userRequestsRouter =require("./SRC/Router/UserRequest")
 
 app.use(express.json());
 app.use(cookieParser());
 app.use("/", authRouter);
 app.use("/", profileRouter)
 app.use("/", requestRouter)
-
+app.use("/", userRequestsRouter)
 
 
 app.get("/user", async(req, res)=>{
