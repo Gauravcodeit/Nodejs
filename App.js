@@ -1,5 +1,7 @@
 const  express=  require('express');
 const app =express();
+const cors = require('cors')
+
 const port = 3000;
 const connectDB = require('./SRC/MongoDB/Database')
 const User = require('./SRC/Model/User');
@@ -9,6 +11,10 @@ const profileRouter = require('./SRC/Router/Profile');
 const requestRouter = require('./SRC/Router/Request');
 const userRequestsRouter =require("./SRC/Router/UserRequest")
 
+app.use(cors({
+    origin:'http://localhost:5173',
+    credentials: true
+}))
 app.use(express.json());
 app.use(cookieParser());
 app.use("/", authRouter);
